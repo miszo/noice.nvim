@@ -38,6 +38,7 @@ end
 
 function M.disable()
   Config._running = false
+  require("noice.restart").disable()
   if Config.options.notify.enabled then
     require("noice.source.notify").disable()
   end
@@ -62,6 +63,7 @@ function M.enable()
     end,
   })
   Config._running = true
+  require("noice.restart").enable()
   if Config.options.notify.enabled then
     require("noice.source.notify").enable()
   end
