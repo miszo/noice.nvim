@@ -190,13 +190,20 @@ function M.on_show(event, content, pos, firstc, prompt, indent, level)
 
   if M.confirm_message then
     local message = M.confirm_message --[[@as NoiceMessage]]
+    local restart = require("noice.restart").is_confirming()
     if message:is_empty() or message:last_line():content() ~= "" then
       message:newline()
     end
     message:append(prompt)
     M.confirm_message = nil
+    if restart then
+      Hacks.hide_cursor()
+    end
     Manager.add(message)
     M._on_hide = function()
+      if restart then
+        Hacks.show_cursor()
+      end
       vim.schedule(function()
         Manager.remove(message)
       end)

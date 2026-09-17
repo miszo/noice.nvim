@@ -5,9 +5,14 @@ local restart = "<C-U>lua require('noice.restart').confirm()<CR>"
 
 M._enabled = false
 M._previous = nil ---@type table?
+M._confirming = false
 
 function M.matches(cmdtype, cmdline)
   return cmdtype == ":" and cmdline == "restart"
+end
+
+function M.is_confirming()
+  return M._confirming
 end
 
 function M.expand(cmdtype, cmdline)
@@ -23,7 +28,13 @@ function M.confirm(deps)
   local restart_nvim = deps.restart or function()
     vim.cmd.restart()
   end
-  if confirm("Restart Neovim?", "&Yes\n&No", 1) == 1 then
+  M._confirming = true
+  local ok, choice = pcall(confirm, "Restart Neovim?", "&Yes\n&No", 1)
+  M._confirming = false
+  if not ok then
+    error(choice)
+  end
+  if choice == 1 then
     restart_nvim()
   end
 end

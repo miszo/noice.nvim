@@ -19,10 +19,12 @@ describe("restart confirmation", function()
 
   it("defaults confirmation to Yes and invokes native restart", function()
     local confirm_args
+    local confirming
     local restarted = 0
     Restart.confirm({
       confirm = function(...)
         confirm_args = { ... }
+        confirming = Restart.is_confirming()
         return 1
       end,
       restart = function()
@@ -31,6 +33,8 @@ describe("restart confirmation", function()
     })
 
     assert.same({ "Restart Neovim?", "&Yes\n&No", 1 }, confirm_args)
+    assert.is_true(confirming)
+    assert.is_false(Restart.is_confirming())
     assert.equal(1, restarted)
   end)
 
